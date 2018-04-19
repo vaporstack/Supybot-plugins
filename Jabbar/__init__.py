@@ -1,6 +1,5 @@
-# -*- encoding: utf8 -*-
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2010, futurestack
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,29 +28,39 @@
 
 ###
 
-from supybot.test import *
+"""
+Add a description of the plugin (to be presented to the user inside the wizard)
+here.  This should describe *what* the plugin does.
+"""
 
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
+import supybot
+import supybot.world as world
 
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
+# Use this for the version of this plugin.  You may wish to put a CVS keyword
+# in here if you're keeping the plugin in CVS or some similar system.
+__version__ = ""
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
+# XXX Replace this with an appropriate author or supybot.Author instance.
+__author__ = supybot.Author('futurestack','st4tic software', 'info@futurestack.com')
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+# This is a dictionary mapping supybot.Author instances to lists of
+# contributions.
+__contributors__ = {}
 
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
+# This is a url where the most recent plugin package can be downloaded.
+__url__ = '' # 'http://supybot.com/Members/yourname/Jabbar/download'
 
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
+import config
+import plugin
+reload(plugin) # In case we're being reloaded.
+# Add more reloads here if you add third-party modules and want them to be
+# reloaded when this plugin is reloaded.  Don't forget to import them as well!
 
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
+if world.testing:
+    import test
+
+Class = plugin.Class
+configure = config.configure
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

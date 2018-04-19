@@ -1,6 +1,5 @@
-# -*- encoding: utf8 -*-
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2014, fs
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,29 +28,22 @@
 
 ###
 
-from supybot.test import *
+import supybot.conf as conf
+import supybot.registry as registry
 
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
+def configure(advanced):
+    # This will be called by supybot to configure this module.  advanced is
+    # a bool that specifies whether the user identified himself as an advanced
+    # user or not.  You should effect your configuration by manipulating the
+    # registry as appropriate.
+    from supybot.questions import expect, anything, something, yn
+    conf.registerPlugin('DWeather', True)
 
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
-
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
-
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
-
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
-
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
+DWeather = conf.registerPlugin('DWeather')
+# This is where your configuration variables (if any) should go.  For example:
+# conf.registerGlobalValue(DWeather, 'someConfigVariableName',
+#     registry.Boolean(False, """Help for someConfigVariableName."""))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

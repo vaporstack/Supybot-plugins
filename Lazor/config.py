@@ -1,6 +1,5 @@
-# -*- encoding: utf8 -*-
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2010, quantumlemur
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,29 +28,42 @@
 
 ###
 
-from supybot.test import *
+import supybot.conf as conf
+import supybot.registry as registry
 
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
+def configure(advanced):
+    # This will be called by supybot to configure this module.  advanced is
+    # a bool that specifies whether the user identified himself as an advanced
+    # user or not.  You should effect your configuration by manipulating the
+    # registry as appropriate.
+    from supybot.questions import expect, anything, something, yn
+    conf.registerPlugin('Lazor', True)
 
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
+Lazor = conf.registerPlugin('Lazor')
+# This is where your configuration variables (if any) should go.  For example:
+# conf.registerGlobalValue(Lazor, 'someConfigVariableName',
+#     registry.Boolean(False, """Help for someConfigVariableName."""))
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+conf.registerChannelValue(Lazor, 'exclusions',
+        registry.SpaceSeparatedListOfStrings([], 
+        """A list of nicks who should be excluded from being 
+            randombombed"""))
 
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
+conf.registerChannelValue(Lazor, 'allowBombs', 
+        registry.Boolean(True, """Determines whether timebombs are allowed 
+            in the channel."""))
 
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
+conf.registerChannelValue(Lazor, 'minTime',
+        registry.PositiveInteger(45, """Determines the minimum time of a 
+            timebomb timer, in seconds."""))
 
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
+conf.registerChannelValue(Lazor, 'maxTime',
+        registry.PositiveInteger(600, """Determines the maximum time of a 
+            timebomb timer, in seconds."""))
 
+conf.registerGlobalValue(Lazor, 'debug',
+        registry.Boolean(False, """Determines whether debugging info will be
+            shown."""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

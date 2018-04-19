@@ -1,4 +1,3 @@
-# -*- encoding: utf8 -*-
 ###
 # Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
@@ -29,29 +28,57 @@
 
 ###
 
-from supybot.test import *
-
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
-
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
-
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
-
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
-
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
-
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
-
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
+import supybot.utils as utils
+from supybot.commands import *
+import supybot.plugins as plugins
+import supybot.ircutils as ircutils
+import supybot.callbacks as callbacks
+from pyfiglet import Figlet
+import glob
 
 
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
+class Birthday(callbacks.Plugin):
+    """Add the help for "@plugin help Birthday" here
+    This should describe *how* to use this plugin."""
+
+    def birthday_fonts(self,irc,msg,args,text):
+        """prints the fonts"""
+        fonts = glob.glob("/usr/local/lib/python2.6/dist-packages/pyfiglet/fonts/*.flf")
+        accum = []
+        for f in fonts:
+            accum.append(f.replace(".flf",""))
+        irc.reply( ",".join(accum) )
+    birthday_fonts = wrap(birthday_fonts,[additional('text')])
+
+    def birthday(self, irc, msg, args,text):
+        """takes no arguments
+            """
+ 	print text       
+        def obnoxious(text, font=None):
+	    if font is None:
+
+                f = Figlet('poison')
+            else:
+                f = Figlet(font)
+ 
+            data = f.renderText(text)
+            print data
+	    data = data.split("\n");
+	    for line in data:
+                #line = line.strip()
+                if line is not "":
+                    irc.reply(line)
+        print "args"
+	print args 
+        #obnoxious("HAPPY")
+        #obnoxious("BIRTHDAY")
+        irc.reply(" *  H A P P Y   B I R T H D A Y *  ")
+        obnoxious(text)
+
+    birthday = wrap(birthday, [additional('text')])
+
+
+Class = Birthday
+
+
+# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

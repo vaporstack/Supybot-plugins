@@ -1,6 +1,5 @@
-# -*- encoding: utf8 -*-
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2004, Daniel DiPaolo
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,32 +25,40 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
 ###
 
-from supybot.test import *
+"""
+Quotegrabs are like IRC sound bites.  When someone says something funny,
+incriminating, stupid, outrageous, ... anything that might be worth
+remembering, you can grab that quote for that person.  With this plugin, you
+can store many quotes per person and display their most recent quote, as well
+as see who "grabbed" the quote in the first place.
+"""
 
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
+import supybot
+import supybot.world as world
 
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
+# Use this for the version of this plugin.  You may wish to put a CVS keyword
+# in here if you're keeping the plugin in CVS or some similar system.
+__version__ = "%%VERSION%%"
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
+# XXX Replace this with an appropriate author or supybot.Author instance.
+__author__ = supybot.authors.strike
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+# This is a dictionary mapping supybot.Author instances to lists of
+# contributions.
+__contributors__ = {}
 
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
+from . import config
+from . import plugin
+from imp import reload
+reload(plugin) # In case we're being reloaded.
 
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
+if world.testing:
+    from . import test
+    
+Class = plugin.Class
+configure = config.configure
 
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
 
-
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
+# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

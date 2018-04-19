@@ -1,6 +1,6 @@
-# -*- encoding: utf8 -*-
+# coding=utf8
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2010, Terje Hoås
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,35 @@
 
 ###
 
-from supybot.test import *
+import supybot.conf as conf
+import supybot.registry as registry
 
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
+def configure(advanced):
+    # This will be called by supybot to configure this module.  advanced is
+    # a bool that specifies whether the user identified himself as an advanced
+    # user or not.  You should effect your configuration by manipulating the
+    # registry as appropriate.
+    from supybot.questions import expect, anything, something, yn
+    conf.registerPlugin('DuckDuckGo', True)
 
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
+DuckDuckGo = conf.registerPlugin('DuckDuckGo')
+# This is where your configuration variables (if any) should go.  For example:
+# conf.registerGlobalValue(DuckDuckGo, 'someConfigVariableName',
+#     registry.Boolean(False, """Help for someConfigVariableName."""))
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+conf.registerGlobalValue(DuckDuckGo, 'showURL',
+    registry.Boolean(True, """Show the URL given for ZCI results?"""))
 
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
+conf.registerGlobalValue(DuckDuckGo, 'safeSearch',
+    registry.Boolean(True, """Enable or disable safe-search?"""))
 
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
+conf.registerGlobalValue(DuckDuckGo, 'maxReplies',
+    registry.Integer(1, """Maximum number of lines to reply with (beware
+        of flooding)"""))
 
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
-
+conf.registerGlobalValue(DuckDuckGo, 'webLink',
+    registry.Boolean(True, """Get the first web link, if there is no ZCI?
+        NOTE: This will require a second request."""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -1,6 +1,5 @@
-# -*- encoding: utf8 -*-
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2010, futurestack
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,27 +30,35 @@
 
 from supybot.test import *
 
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
+class JabbarTestCase(PluginTestCase):
+    plugins = ('Jabbar',)
 
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
+    def testJabbar(self):
+        # difficult to test, let's just make sure it works
+        self.assertNotError('jabbar')
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
+    def testSeed(self):
+        # just make sure it works
+        self.assertNotError('seed 20')
+        
+        
+    def testSample(self):
+        self.assertError('sample 20 foo')
+        self.assertResponse('sample 1 foo', 'foo')
+        self.assertRegexp('sample 2 foo bar', '... and ...')
+        self.assertRegexp('sample 3 foo bar baz', '..., ..., and ...')
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+    def testDiceRoll(self):
+        self.assertActionRegexp('diceroll', 'rolls a \d')
 
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
-
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
-
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
-
+    def testSeedActuallySeeds(self):
+        # now to make sure things work repeatably
+        self.assertNotError('seed 20')
+        m1 = self.getMsg('random')
+        self.assertNotError('seed 20')
+        m2 = self.getMsg('random')
+        self.failUnlessEqual(m1, m2)
+        m3 = self.getMsg('random')
+        self.failIfEqual(m2, m3)
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

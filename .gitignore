@@ -11,3 +11,6 @@ docs/plugins
 *~
 *.mo
 README.txt
+.DS_Store
+*(Autosaved)*
+

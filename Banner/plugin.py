@@ -1,6 +1,6 @@
-# -*- encoding: utf8 -*-
+
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2016, vs
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,45 @@
 
 ###
 
-from supybot.test import *
+import supybot.utils as utils
+from supybot.commands import *
+import supybot.plugins as plugins
+import supybot.ircutils as ircutils
+import supybot.callbacks as callbacks
 
-class WikiTransTestCase(PluginTestCase):
-    plugins = ('WikiTrans',)
+import pyfiglet
+from pyfiglet import Figlet
 
-    def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
+class Banner(callbacks.Plugin):
+    """Add the help for "@plugin help Banner" here
+    This should describe *how* to use this plugin."""
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
-        self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
+    def bannerfont(self, irc, msg, args, text):
+        """[<number of sides>]
+        
+        rolls dice with n sides
+        """
+        try:
+            f = Figlet(font=text)
+            self.setRegistryValue('font', text)
+            irc.replySuccess()
+        except:
+            irc.reply("Unable to set font! (see http://www.figlet.org )")
+    bannerfont = wrap(bannerfont, [additional('text')])
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+    def banner(self, irc, msg, args, text):
+        """PRINT STUFF ALL BEIG"""
+        font = self.registryValue('font')
+        f = Figlet(font=font)
+        text = f.renderText(text).split("\n")
+        text = [x for x in text if x.strip() != ""]
+        for t in text:
+            irc.reply(t)
+        ##irc.reply("msg: %s" %  msg)
+        #irc.reply("arg: %s" % args)
+    banner = wrap(banner, [additional('text')])
 
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
-
-        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
-
-        self.assertError('translate fr de Supybot')
-        self.assertError('translate fr en pogjoeregml')
+Class = Banner
 
 
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
+# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
